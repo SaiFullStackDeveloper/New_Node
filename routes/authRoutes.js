@@ -8,7 +8,7 @@ router.post('/register', register);
 router.post('/login', login);
 
 // Example protected route
-router.get('/admin', authenticate, authorize(['Admin']), (req, res) => {
+router.get('/admin', authenticate, authorize() , (req, res) => {
     res.status(200).json({ message: 'Welcome, Admin!' });
 });
 

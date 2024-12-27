@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const authenticate = (req, res, next) => {
-    const token = req.headers['authorization'];
+    const token = req.headers['token'];
+    console.log('token-->', token)
     if (!token) return res.status(403).json({ message: 'Token required' });
 
     try {
@@ -13,7 +14,8 @@ const authenticate = (req, res, next) => {
     }
 };
 
-const authorize = (roles) => (req, res, next) => {
+const authorize = () => (req, res, next) => {
+    const roles = ['Admin', 'User']; // add the accessed roles here
     if (!roles.includes(req.user.role)) {
         return res.status(403).json({ message: 'Access denied' });
     }

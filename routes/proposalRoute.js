@@ -2,11 +2,12 @@
 const express = require('express');
 const axios = require('axios');  // For making HTTP requests
 const Application = require('../models/proposalModel');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // POST API for submitting a policy application
-router.post('/proposal-application', async (req, res) => {
+router.post('/proposal-application', authenticate, authorize(), async (req, res) => {
     try {
         // URL for the external API
         const apiUrl = 'https://sandbox-sg-gw.insuremo.com/grandiosesg/1.0/pa-bff-app/v1/policy/application';

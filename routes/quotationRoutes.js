@@ -2,11 +2,13 @@
 const express = require('express');
 const axios = require('axios');  // Axios for making HTTP requests
 const Quotation = require('../models/quotationModel');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
+
 
 const router = express.Router();
 
 // POST API for getting quotation
-router.post('/quotation', async (req, res) => {
+router.post('/quotation',  authenticate, authorize(), async (req, res) => {
     try {
         // URL for the external API
         const apiUrl = 'https://sandbox-sg-gw.insuremo.com/grandiosesg/1.0/pa-bff-app/v1/policy/quotation';
