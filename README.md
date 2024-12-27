@@ -1,4 +1,4 @@
-1. npm install
+1. After cloning :  Run  `npm install`  : TO RUN THE PROJECT : `node server.js`
 2. create some users by using `http://localhost:3000/api/register`
                 Inputs : {
                             "username" : "agent",
