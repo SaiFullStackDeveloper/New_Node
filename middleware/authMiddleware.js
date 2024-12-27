@@ -2,9 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const authenticate = (req, res, next) => {
     const token = req.headers['token'];
-    console.log('token-->', token)
     if (!token) return res.status(403).json({ message: 'Token required' });
-
     try {
         const decoded = jwt.verify(token, 'secretKey');
         req.user = decoded;
