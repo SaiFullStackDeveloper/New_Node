@@ -22,7 +22,7 @@ router.post('/quotation', async (req, res) => {
         const response = await axios.post(apiUrl, req.body, {
             headers: {
                 'Content-Type': 'application/json',
-                   'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`
             }
         });
 
