@@ -3,17 +3,17 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
 // 1. Register service logic
-const registerUser = async (username, password, role) => {
+const registerUser = async (username, email, password, role) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ username, password: hashedPassword, role });
+    const newUser = new User({ username, email, password: hashedPassword, role });
     await newUser.save();
 
     return { message: 'User registered successfully' };
 };
 
 // 2. Login service logic
-const loginUser = async (username, password) => {
+const loginUserWithPswd = async (username, password) => {
     const user = await User.findOne({ username });
     if (!user) return { success: false, status: 404, message: 'User not found' };
 
@@ -25,4 +25,15 @@ const loginUser = async (username, password) => {
     return { success: true, token };
 };
 
-module.exports = { registerUser, loginUser };
+
+// 2. Login service logic
+const loginUserWithOTP = async (email) => {
+    const user = await User.findOne({ email });
+    if (!user) return { success: false, status: 404, message: 'User not found' };
+
+    const token = jwt.sign({ id: user._id, role: user.role }, 'secretKey', { expiresIn: '1h' });
+
+    return { success: true, token };
+};
+
+module.exports = { registerUser, loginUserWithPswd,  loginUserWithOTP};
