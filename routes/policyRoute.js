@@ -1,7 +1,7 @@
 
 const express = require('express');
 const axios = require('axios');  // For making HTTP requests
-const Application = require('../models/proposalModel');
+const Application = require('../models/policyModel');
 const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 
@@ -34,7 +34,7 @@ router.post('/policy-issuance', authenticate, authorize() , async (req, res) => 
         const newApplication = new Application({
             policyNo: applicationData.PolicyNo,  // Use the appropriate field from the response
             policyDetails: applicationData,  // Adjust as needed
-            PolicyStatus: applicationData.PolicyStatus,  // Adjust as needed
+            policyStatus: applicationData.PolicyStatus,  // Adjust as needed
         });
 
         await newApplication.save();
