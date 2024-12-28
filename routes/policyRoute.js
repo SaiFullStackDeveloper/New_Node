@@ -59,4 +59,16 @@ router.post('/policy-issuance', authenticate, authorize() , async (req, res) => 
     }
 });
 
+
+// GET API for a policy application
+router.get('/policy-issuance', async (req, res) => {
+    try {
+        const proposals = await Application.find();
+        res.status(200).json(proposals);
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching proposals', error });
+      }
+});
+
+
 module.exports = router;
