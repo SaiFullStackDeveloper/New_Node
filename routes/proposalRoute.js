@@ -6,6 +6,19 @@ const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+
+
+// GET API for a Proposal application
+router.get('/proposal-application', async (req, res) => {
+    try {
+        const proposals = await Application.find();
+        res.status(200).json(proposals);
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching proposals', error });
+      }
+});
+
+
 // POST API for submitting a policy application
 router.post('/proposal-application', authenticate, authorize(), async (req, res) => {
     try {
