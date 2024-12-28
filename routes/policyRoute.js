@@ -2,7 +2,7 @@
 const express = require('express');
 const axios = require('axios');  // For making HTTP requests
 const Application = require('../models/policyModel');
-const { authenticate, authorize } = require('../middleware/authMiddleware');
+const { authenticate, authorize, getAuthKey } = require('../middleware/authMiddleware');
 
 
 const router = express.Router();
@@ -13,7 +13,8 @@ router.post('/policy-issuance', authenticate, authorize() , async (req, res) => 
         // URL for the external API
         const apiUrl = 'https://sandbox-sg-gw.insuremo.com/grandiosesg/1.0/pa-bff-app/v1/policy/issuePolicy';
 
-        const token = req.headers['authorization'];
+        const token = getAuthKey();
+        console.log('token---->', token)
 
         // If the token is not present, send an error
         if (!token) {

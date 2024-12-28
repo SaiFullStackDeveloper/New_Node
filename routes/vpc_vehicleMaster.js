@@ -2,7 +2,7 @@
 const express = require('express');
 const axios = require('axios');  // Axios for making HTTP requests
 const Quotation = require('../models/quotationModel');
-const { authenticate, authorize } = require('../middleware/authMiddleware');
+const { authenticate, authorize, getAuthKey } = require('../middleware/authMiddleware');
 
 
 const router = express.Router();
@@ -13,7 +13,7 @@ router.post('/vpc-vehicle-master', async (req, res) => {
         // URL for the external API
         const apiUrl = 'https://grandiosesg-sandbox-sg.insuremo.com/api/platform/dd/code/cache/v1/record/list/byName?name=VPC_VehicleMaster';
 
-        const token = req.headers['authorization'];
+        const token = await getAuthKey();
 
         // If the token is not present, send an error
         if (!token) {

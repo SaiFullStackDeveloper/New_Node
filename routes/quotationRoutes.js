@@ -2,7 +2,7 @@
 const express = require('express');
 const axios = require('axios');  // Axios for making HTTP requests
 const Quotation = require('../models/quotationModel');
-const { authenticate, authorize } = require('../middleware/authMiddleware');
+const { authenticate, authorize, getAuthKey } = require('../middleware/authMiddleware');
 
 
 const router = express.Router();
@@ -13,7 +13,8 @@ router.post('/quotation',  authenticate, authorize(), async (req, res) => {
         // URL for the external API
         const apiUrl = 'https://sandbox-sg-gw.insuremo.com/grandiosesg/1.0/pa-bff-app/v1/policy/quotation';
 
-        const token = req.headers['authorization'];
+        const token =await getAuthKey();
+        console.log('quotation token-->', token)
 
         // If the token is not present, send an error
         if (!token) {
@@ -28,20 +29,10 @@ router.post('/quotation',  authenticate, authorize(), async (req, res) => {
             }
         });
 
-        // Store the quotation response in the MongoDB
-        const quotationData = response.data;  // Adjust based on the actual API response structure
-        const newQuotation = new Quotation({
-            quotationId: quotationData.ProductId,  // Use the appropriate field from the response
-            policyDetails: quotationData,  // Adjust based on actual structure
-            status: quotationData.PolicyStatus,  // Adjust based on actual structure
-        });
-
-        await newQuotation.save();
-
         // Send a response back to the client
         res.status(201).json({
             message: 'Quotation generated successfully',
-            data: newQuotation
+            data: response.data
         });
     } catch (error) {
         console.error('Error fetching quotation:', error);
