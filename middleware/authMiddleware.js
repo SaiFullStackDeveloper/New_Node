@@ -50,7 +50,6 @@ const getAuthKey = async () => {
       }
   
       const authToken = authResponse.data.access_token;
-      console.log('authtoken-->', authToken)
   
       // Log success for debugging purposes
       console.log('Authentication successful, token retrieved.');
@@ -70,6 +69,19 @@ const getAuthKey = async () => {
       throw new Error('Failed to get authentication key. Please check your credentials and network.');
     }
   };
+
+  // Middleware to authenticate and extract user info from JWT
+const getUserFromToken = (req, res, next) => {
+  const token = req.headers['token'];
+  if (!token) return res.status(401).json({ message: 'Authorization token missing' });
+
+  jwt.verify(token, 'secretKey', (err, user) => {
+    if (err) return res.status(403).json({ message: 'Invalid token' });
+
+    req.user = user; // Attach user details to request object
+    next();
+  });
+};
   
 
-module.exports = { authenticate, authorize, getAuthKey };
+module.exports = { authenticate, authorize, getAuthKey, getUserFromToken };

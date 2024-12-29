@@ -2,25 +2,23 @@
 const express = require('express');
 const axios = require('axios');  // For making HTTP requests
 const Application = require('../models/policyModel');
-const { authenticate, authorize, getAuthKey } = require('../middleware/authMiddleware');
+const { authenticate, authorize, getAuthKey, getUserFromToken } = require('../middleware/authMiddleware');
 
 
 const router = express.Router();
 
 // POST API for submitting a policy application
-router.post('/policy-issuance', authenticate, authorize() , async (req, res) => {
+router.post('/policy-issuance', getUserFromToken, authenticate, authorize() , async (req, res) => {
     try {
         // URL for the external API
         const apiUrl = 'https://sandbox-sg-gw.insuremo.com/grandiosesg/1.0/pa-bff-app/v1/policy/issuePolicy';
 
         const token = getAuthKey();
-        console.log('token---->', token)
 
         // If the token is not present, send an error
         if (!token) {
             return res.status(403).json({ message: 'Authorization token is required' });
         }
-
 
         // Send request to the external API
         const response = await axios.post(apiUrl, req.body, {
@@ -30,10 +28,13 @@ router.post('/policy-issuance', authenticate, authorize() , async (req, res) => 
             }
         });
 
+        const userId = req.user.id; // Extracted from JWT
+
         // Store the application response in MongoDB
         const applicationData = response.data;  // Adjust based on the actual API response structure
         const newApplication = new Application({
             policyNo: applicationData.PolicyNo,  // Use the appropriate field from the response
+            createdBy: userId,
             policyDetails: applicationData,  // Adjust as needed
             policyStatus: applicationData.PolicyStatus,  // Adjust as needed
         });
@@ -62,12 +63,23 @@ router.post('/policy-issuance', authenticate, authorize() , async (req, res) => 
 
 
 // GET API for a policy application
-router.get('/policy-issuance', async (req, res) => {
+router.post('/get-policy-issuance', getUserFromToken, async (req, res) => {
     try {
-        const proposals = await Application.find();
-        res.status(200).json(proposals);
+
+        const userRole = req.user.role; // Extracted from JWT
+        const userId = req.user.id; // Assuming JWT includes userId
+        
+        let policies;
+        if (userRole === 'Admin') {
+            // Admin can view all policies
+            policies = await Application.find(); // Fetch all policies
+        } else   {
+            // Users can view only their policies
+            policies = await Application.find({ createdBy: userId }); // Filter by createdBy
+        }
+        res.status(200).json(policies);
       } catch (error) {
-        res.status(500).json({ message: 'Error fetching proposals', error });
+        res.status(500).json({ message: 'Error fetching policies', error });
       }
 });
 
